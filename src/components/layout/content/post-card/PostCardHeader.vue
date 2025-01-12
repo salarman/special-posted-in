@@ -8,7 +8,7 @@
         <span :class="ui.author.name" aria-hidden="true">{{ appConfig.fullName }}</span>
       </a>
       <div :class="ui.author.intro" >
-        <span aria-hidden="true">{{ props.position }} At <strong>{{ props.company }}</strong></span>
+        <span aria-hidden="true">{{ props.position }} @ <strong>{{ props.company }}</strong></span>
         </div>
       <div :class="ui.date.wrapper">
         <span :class="ui.date.icon">

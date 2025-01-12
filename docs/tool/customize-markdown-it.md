@@ -198,7 +198,7 @@ const html = md.render(markdownText);
 
 이런 코드를 보면 순서로 봤을 때 [`blockquote_open` ,`paragraph_open`, `inline`, `paragragh_close`, `blockquote_close`] 로 진행된다.
 
-만약 내가 `blockquote` 태그에 `class="waring" 이라는 속성을 추가 해주고 싶다면. 이 정보를 전달해야한다.
+만약 내가 `blockquote` 태그에 `class="waring"` 이라는 속성을 추가 해주고 싶다면. 이 정보를 전달해야한다.
 
 ```markdown
 > 준비운동을 하지 않고 물에 들어간다면, 다리에 쥐가 날 수 있다.
