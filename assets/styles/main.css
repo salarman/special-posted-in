@@ -306,6 +306,10 @@
     word-break: break-word
 }
 
+.prose :where(pre.mermaid):not(:where([class~=not-prose],[class~=not-prose] *)) {
+    border: none;
+}
+
 .prose :where(pre code):not(:where([class~=not-prose],[class~=not-prose] *)) {
     background-color: initial;
     border-radius: 0;
