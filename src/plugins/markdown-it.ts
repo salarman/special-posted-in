@@ -3,7 +3,6 @@ import {DEFAULT_MARKDOWN_IT_OPTIONS} from "@/utils/markdown-utils";
 import DecoratorProvider from "@/markup/decorator/decorator-provider";
 import RuleType from "@/markup/constant/rule-type";
 import shiki from "@shikijs/markdown-it";
-import markdownItTextualUml from "markdown-it-textual-uml";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     if (nuxtApp.$md) return;
@@ -37,15 +36,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         },
     });
     markdownIt.use(shikiExtension);
-    markdownIt.use(markdownItTextualUml, {
-        marker: 'mermaid',
-        mermaidConfig: {
-            theme: 'forest',
-            sequence: {
-                showSequenceNumbers: true
-            }
-        }
-    });
 
     nuxtApp.provide('md', markdownIt);
 });

@@ -40,21 +40,34 @@ const scrollToHeading = (id: string) => {
   router.push(`#${id}`)
   emit('move', id);
 };
+const unescapeHtml = (html: string): string => {
+  return html
+      .replace(/&gt;/g, '>')
+      .replace(/&lt;/g, '<')
+      .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, '&')
+      .replace(/&#39;/g, "'");
+};
 
 nuxtApp.hooks.hookOnce('page:finish', () => {
   if (prepareStore.isPrepare) {
-    const imageTags = document.querySelectorAll('.rendered-markdown-wrapper img');
-    imageTags.forEach((imgTag, index) => {
+    //photo view
+    document.querySelectorAll('.rendered-markdown-wrapper img').forEach((imgTag, index) => {
       imgTag.addEventListener('click', (e) => {
         photoViewStatusStore.open(index +1)
       });
     });
+    //toc
     scrollspy.updateHeadings(props.headline, [
       ...document.querySelectorAll('h2'),
       ...document.querySelectorAll('h3')
     ]);
-
-    mermaid.initialize({ startOnLoad: true });
+    //mermaid
+    document.querySelectorAll('pre.mermaid')
+        .forEach(async (element: Element) => {
+          const {svg} = await mermaid.render(`mermaid-${element.id}`, unescapeHtml(element.innerHTML));
+          element.innerHTML = svg;
+        });
     prepareStore.done();
   }
 });
