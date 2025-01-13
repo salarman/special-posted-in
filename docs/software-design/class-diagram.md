@@ -10,7 +10,7 @@ current-company: Computer Academy
 current-position: Student
 summary: Class Diagram
 excerpt-separator: <!--more-->
-hide: true
+hide: false
 ---
 
 소프트 웨어에서는 각 객체와 객체 간의 관계를 표현하기 위해 클래스 다이어그램을 사용한다. 
@@ -34,6 +34,7 @@ hide: true
 
 ```mermaid
 classDiagram
+    direction LR
     class Student {
         -id: int
         -name: String
@@ -41,7 +42,8 @@ classDiagram
     class Teacher {
         -id: int
         -name: String
+        +attendance(String name): void
     }
-    Student --> Teacher
+    Teacher --> Student
 ```
 

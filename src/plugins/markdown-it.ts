@@ -3,7 +3,7 @@ import {DEFAULT_MARKDOWN_IT_OPTIONS} from "@/utils/markdown-utils";
 import DecoratorProvider from "@/markup/decorator/decorator-provider";
 import RuleType from "@/markup/constant/rule-type";
 import shiki from "@shikijs/markdown-it";
-import mditMermaid from "md-it-mermaid";
+import markdownItTextualUml from "markdown-it-textual-uml";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
     if (nuxtApp.$md) return;
@@ -17,7 +17,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         RuleType.LINK,
         RuleType.TABLE,
         RuleType.IMAGE_GROUP
-    ).forEach(decorator => decorator.decorate(markdownIt, true));
+    ).forEach(decorator => decorator.decorate(markdownIt));
 
     const shikiExtension = await shiki({
         transformers: [
@@ -37,7 +37,15 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         },
     });
     markdownIt.use(shikiExtension);
-    markdownIt.use(mditMermaid);
+    markdownIt.use(markdownItTextualUml, {
+        marker: 'mermaid',
+        mermaidConfig: {
+            theme: 'forest',
+            sequence: {
+                showSequenceNumbers: true
+            }
+        }
+    });
 
     nuxtApp.provide('md', markdownIt);
 });

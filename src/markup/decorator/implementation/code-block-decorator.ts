@@ -5,6 +5,7 @@ import Renderer from "markdown-it/lib/renderer";
 import Filename from "@/classes/implement/filename";
 import {getLanguageCode} from "@/utils/markdown-utils";
 import mermaid from "mermaid";
+import type {RendererRuleArguments} from "@/markup/decorator/rederer-rule";
 
 export default class CodeBlockDecorator implements IMarkdownDecorator {
 
@@ -14,7 +15,7 @@ export default class CodeBlockDecorator implements IMarkdownDecorator {
     public decorate(markdownIt: MarkdownIt, isDebug: boolean = false): void {
         const proxy = (tokens: Array<Token>, index: number, options: MarkdownIt.Options, env: any, self: Renderer) => self.renderToken(tokens, index, options);
         const defaultFence = markdownIt.renderer.rules.fence || proxy;
-        // @ts-ignore
+
         this.decorateHighlighting(markdownIt, defaultFence);
     }
 
@@ -28,9 +29,6 @@ export default class CodeBlockDecorator implements IMarkdownDecorator {
         ): string => {
             const token = tokens[index];
             const name = token.info;
-            if (name === 'mermaid') {
-                return defaultFence(tokens, index, options, env, self);
-            }
 
             // @ts-ignore
             if (!token.lineNumber) {
@@ -67,6 +65,18 @@ export default class CodeBlockDecorator implements IMarkdownDecorator {
                         <!--beforeend-->
                     </div>`;
         }
+    }
+
+    private decorateMermaid(token: Token, args: RendererRuleArguments): string {
+        const code = (async () => {
+            await mermaid.render(`mermaid-diagram-${args.index}`, token.content);
+        })();
+
+        code.then((success) => {
+            console.log('Mermaid diagram rendered', success);
+        });
+
+        return `<div class="mermaid">${code}</div>`;
     }
 
     private decorateHighlightLines(token: Token, lang: string, rawCode: string): string {

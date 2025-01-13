@@ -16,6 +16,7 @@ import TocNode from "@/classes/implement/toc-node";
 import {useScrollspy} from "@/store/scroll-spy";
 import {usePagePrepareStore} from "@/store/prepare-post-store";
 import {usePhotoViewStatusStore} from "@/store/photo-view-store";
+import mermaid from "mermaid";
 
 const router = useRouter();
 const scrollspy = useScrollspy();
@@ -52,6 +53,8 @@ nuxtApp.hooks.hookOnce('page:finish', () => {
       ...document.querySelectorAll('h2'),
       ...document.querySelectorAll('h3')
     ]);
+
+    mermaid.initialize({ startOnLoad: true });
     prepareStore.done();
   }
 });
