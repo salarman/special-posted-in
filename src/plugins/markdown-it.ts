@@ -7,7 +7,6 @@ import codeGroupParser from "@/plugins/markdown-it/code-group-parser";
 import imageGroupParser from "@/plugins/markdown-it/image-group-parser";
 
 
-
 export default defineNuxtPlugin(async (nuxtApp) => {
     if (nuxtApp.$md) return;
     const markdownIt = new MarkdownIt(DEFAULT_MARKDOWN_IT_OPTIONS);
@@ -43,7 +42,7 @@ const crateShikiExtension = await shiki({
         }
     ],
     themes: {
-        light: 'material-theme-lighter',
-        dark: 'material-theme-palenight'
+        light: 'min-light',
+        dark: 'dracula-soft'
     },
 });
