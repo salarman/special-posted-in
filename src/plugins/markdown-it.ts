@@ -13,7 +13,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
     markdownIt.use(codeGroupParser);
     markdownIt.use(imageGroupParser);
-    markdownIt.use(crateShikiExtension);
+    markdownIt.use(await crateShikiExtension);
 
     DecoratorProvider.provides(
         RuleType.BLOCK_QUOTE,
@@ -29,7 +29,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     nuxtApp.provide('md', markdownIt);
 });
 
-const crateShikiExtension = await shiki({
+const crateShikiExtension = shiki({
     transformers: [
         {
             code(hast: any) {
