@@ -8,6 +8,7 @@ import LinkDecorator from "@/markup/decorator/implementation/link-decorator";
 import TableDecorator from "@/markup/decorator/implementation/table-decorator";
 import StyleDecorator from "@/markup/decorator/style/style-decorator";
 import ImageGroupDecorator from "@/markup/decorator/implementation/image-group-decorator";
+import CodeGroupDecorator from "@/markup/decorator/implementation/code-group-decorator";
 
 export default class DecoratorProvider {
 
@@ -22,7 +23,8 @@ export default class DecoratorProvider {
             [RuleType.LINK, new LinkDecorator()],
             [RuleType.TABLE, new TableDecorator()],
             [RuleType.IMAGE_GROUP, new ImageGroupDecorator()],
-            [RuleType.IMAGE, new ImageDecorator()]
+            [RuleType.IMAGE, new ImageDecorator()],
+            [RuleType.CODE_GROUP, new CodeGroupDecorator()]
         ]
 
         this._decorators = new Map<RuleType, IMarkdownDecorator>(entries);

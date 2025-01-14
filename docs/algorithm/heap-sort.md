@@ -116,14 +116,25 @@ hide: false
 
 위의 순서를 반복하며, 만든 힙 정렬은 아래와 같습니다.
 
+::image-group
+
 ![힙 정렬 1](/post/algorithm/heap/heap_sort_1_1.svg)
+
 ![힙 정렬 2](/post/algorithm/heap/heap_sort_1_2.svg)
+
 ![힙 정렬 3](/post/algorithm/heap/heap_sort_1_3.svg)
+
 ![힙 정렬 4](/post/algorithm/heap/heap_sort_1_4.svg)
+
 ![힙 정렬 5](/post/algorithm/heap/heap_sort_1_5.svg)
+
 ![힙 정렬 6](/post/algorithm/heap/heap_sort_1_6.svg)
+
 ![힙 정렬 7](/post/algorithm/heap/heap_sort_1_7.svg)
+
 ![힙 정렬 8](/post/algorithm/heap/heap_sort_1_8.svg)
+
+::
 
 ## 구현 코드 (Java)::implementation-code
 

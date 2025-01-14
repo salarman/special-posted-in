@@ -7,6 +7,7 @@ export default class RuleType {
     public static readonly LINK = new RuleType('link');
     public static readonly TABLE = new RuleType('table');
     public static readonly IMAGE_GROUP = new RuleType('image_group');
+    public static readonly CODE_GROUP = new RuleType('code_group');
     public static readonly IMAGE = new RuleType('image');
 
     private readonly _name: string;
