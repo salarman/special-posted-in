@@ -5,6 +5,7 @@ import Renderer from "markdown-it/lib/renderer";
 import Filename from "@/classes/implement/filename";
 import {getLanguageCode} from "@/utils/markdown-utils";
 import type {RendererRuleArguments} from "@/markup/decorator/rederer-rule";
+import {useCodeGroupStore} from "@/store/code-group-store";
 
 export default class CodeBlockDecorator implements IMarkdownDecorator {
 
@@ -30,6 +31,10 @@ export default class CodeBlockDecorator implements IMarkdownDecorator {
             const name = token.info;
             if (name === 'mermaid') {
                 return this.decorateMermaid(token, {tokens, index, options, env, self});
+            }
+
+            if (token.attrIndex('code-group-index') >= 0) {
+                return this.decorateCodeGroup(token, {tokens, index, options, env, self});
             }
 
             // @ts-ignore
@@ -147,5 +152,19 @@ export default class CodeBlockDecorator implements IMarkdownDecorator {
     get wrapperRe(): RegExp {
         this._wrapper.lastIndex = 0;
         return this._wrapper;
+    }
+
+    private decorateCodeGroup(token: Token, args: RendererRuleArguments) {
+        const groupIndex = parseInt(token.attrGet('code-group-index')!, 10);
+        const filename = new Filename(token.info);
+        const code = args.options.highlight?.(token.content, getLanguageCode(filename.ext), '');
+
+        useCodeGroupStore().addCodeGroup(token.attrGet('code-group-number')!, token.info, code);
+        if (groupIndex === 0) {
+            return code
+        }
+
+        //두번째 렌더링부터는 코드를 바로 렌더링 하지않는다.
+        return "";
     }
 }

@@ -17,12 +17,14 @@ import {useScrollspy} from "@/store/scroll-spy";
 import {usePagePrepareStore} from "@/store/prepare-post-store";
 import {usePhotoViewStatusStore} from "@/store/photo-view-store";
 import mermaid from "mermaid";
+import {useCodeGroupStore} from "@/store/code-group-store";
 
 const router = useRouter();
 const scrollspy = useScrollspy();
 const nuxtApp = useNuxtApp();
 const prepareStore = usePagePrepareStore();
 const photoViewStatusStore = usePhotoViewStatusStore();
+const codeGroupStore = useCodeGroupStore();
 const props = defineProps<{
   headline: TocNode,
   isInner: boolean,
@@ -68,6 +70,31 @@ nuxtApp.hooks.hookOnce('page:finish', () => {
           const {svg} = await mermaid.render(`mermaid-${element.id}`, unescapeHtml(element.innerHTML));
           element.innerHTML = svg;
         });
+    //code-group
+    const activateClasses = 'bg-gray-100 dark:bg-gray-800'.split(' ');
+    const deactivateClasses = 'hover:bg-gray-50 dark:hover:bg-gray-800/50'.split(' ');
+
+    document.querySelectorAll('.code-group').forEach((codeWrapper) => {
+      const groupNumber = (codeWrapper as HTMLElement).dataset.groupNumber;
+      const buttons = document.querySelectorAll(`.${codeWrapper.id}-buttons button`);
+      buttons.forEach((element) => {
+        const button = element as HTMLButtonElement;
+        button.addEventListener('click', () => {
+          codeWrapper.innerHTML = codeGroupStore.getCodeGroup(groupNumber!, button.innerText);
+          //기존 버튼들 버튼 비활성화
+          buttons.forEach((other) => {
+            const otherButton = other as HTMLButtonElement;
+            otherButton.classList.remove(...activateClasses, ...deactivateClasses);
+
+            if (otherButton.innerText === button.innerText) {
+              otherButton.classList.add(...activateClasses);
+            } else {
+              otherButton.classList.add(...deactivateClasses);
+            }
+          });
+        });
+      });
+    });
     prepareStore.done();
   }
 });
