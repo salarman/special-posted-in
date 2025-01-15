@@ -2,7 +2,8 @@ import type IMarkdownDecorator from "@/markup/decorator/i-markdown-decorator";
 import MarkdownIt from "markdown-it";
 import Token from "markdown-it/lib/token";
 import Renderer from "markdown-it/lib/renderer";
-import {TokenNesting} from "@/markup/constant/token-nesting";
+import {findChildrenIndexes, findCloseIndex, findTokens, wrappingTokens} from "@/markup/utils/markdown-it-util";
+import {arrayCopy, arrayCopyWith} from "@/utils/collection-util";
 
 export default class ImageGroupDecorator implements IMarkdownDecorator {
 
@@ -13,36 +14,20 @@ export default class ImageGroupDecorator implements IMarkdownDecorator {
         const proxy = (tokens: Array<Token>, index: number, options : MarkdownIt.Options, env: any, self: Renderer) => self.renderToken(tokens, index, options);
         const fallbackRule = markdownIt.renderer.rules[ImageGroupDecorator.KEY_OPEN] || proxy;
 
-        markdownIt.renderer.rules[ImageGroupDecorator.KEY_OPEN] = (tokens: Array<Token>, index: number, options: MarkdownIt.Options, env: any, self: Renderer): string => {
-            const startToken = tokens[index];
-            const range = tokens.slice(index, tokens.length);
-            const endIndex = range.findIndex(token => token.type === ImageGroupDecorator.KEY_CLOSE);
+        markdownIt.renderer.rules[ImageGroupDecorator.KEY_OPEN] = (tokens: Array<Token>, start: number, options: MarkdownIt.Options, env: any, self: Renderer): string => {
+            const end = findCloseIndex(ImageGroupDecorator.KEY_CLOSE, tokens, start);
+            const children = findChildrenIndexes(tokens, start, end).map(index => tokens[index]);
 
-            if (endIndex === -1) {
-                console.error('not found end token');
-                return '';
-            }
-
-            const endToken = tokens[endIndex];
-
-            const firstParagraphIndex = tokens.slice(index + 1, endIndex).findIndex(token => token.type === 'paragraph_open');
-            if (firstParagraphIndex === -1) {
-                console.error('not found first paragraph');
-                return fallbackRule(tokens, index, options, env, self);
-            }
-
-            const lastParagraphIndex = tokens.slice(index + 1, endIndex).findLastIndex(token => token.type === 'paragraph_close');
-            if (lastParagraphIndex === -1) {
-                console.error('not found last paragraph');
-                return fallbackRule(tokens, index, options, env, self);
-            }
-
-            //인덱스 변경으로 인해 뒤에서 부터 추가
-            tokens.splice(lastParagraphIndex, 0, new Token('', 'div', TokenNesting.CLOSE));
-            tokens.splice(firstParagraphIndex, 0, new Token('', 'div', TokenNesting.OPEN));
-
-            return self.renderToken(tokens, index, options);
+            const images = findTokens(children, 'image');
+            images.forEach((token, index) => {
+               token.attrSet('group-index', start.toString());
+               token.attrSet('image-number', (index +1).toString());
+               token.attrSet('group-image-count', images.length.toString());
+            });
+            const direction = images.length === 3 ? 'flex-col' : 'flex-row';
+            return `<div class="h-96 flex border border-gray-200 dark:border-gray-800 ${direction}">`;
         }
     }
+
 
 }

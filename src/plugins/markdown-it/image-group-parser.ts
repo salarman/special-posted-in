@@ -56,7 +56,7 @@ export default (md: MarkdownIt) => {
     });
 
     md.renderer.rules[ImageGroupDecorator.KEY_OPEN] = function(tokens, idx) {
-        return `<div>\n`;
+        return `<div class="">\n`;
     };
 
     md.renderer.rules[ImageGroupDecorator.KEY_CLOSE] = function(tokens, idx) {

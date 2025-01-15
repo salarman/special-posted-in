@@ -4,6 +4,7 @@ import Token from "markdown-it/lib/token";
 import Renderer from "markdown-it/lib/renderer";
 import Filename from "@/classes/implement/filename";
 import {getLanguageCode} from "@/utils/markdown-utils";
+import {findChildrenIndexes, findCloseIndex} from "@/markup/utils/markdown-it-util";
 
 export default class CodeGroupDecorator implements IMarkdownDecorator {
 
@@ -15,13 +16,10 @@ export default class CodeGroupDecorator implements IMarkdownDecorator {
         const fallbackRule = markdownIt.renderer.rules[CodeGroupDecorator.KEY_OPEN] || proxy;
 
         markdownIt.renderer.rules[CodeGroupDecorator.KEY_OPEN] = (tokens: Array<Token>, index: number, options: MarkdownIt.Options, env: any, self: Renderer): string => {
-            const startToken = tokens[index];
-            const range = tokens.slice(index, tokens.length);
-            const endIndex = range.findIndex(token => token.type === CodeGroupDecorator.KEY_CLOSE) + index;
+            const endIndex = findCloseIndex(CodeGroupDecorator.KEY_CLOSE, tokens, index);
 
-            const indexes = tokens.slice(index + 1, endIndex)
-                .filter(token => token.type === 'fence')
-                .map((token, idx) => index + idx + 1);
+            const indexes = findChildrenIndexes(tokens, index, endIndex)
+                .filter(tokenIndex => tokens[tokenIndex].type === 'fence');
 
             const buttons = this.generateButtons(indexes, tokens);
 
@@ -38,7 +36,7 @@ export default class CodeGroupDecorator implements IMarkdownDecorator {
                         </div>
                         <div class="code-group relative [&>pre]:!rounded-t-none [&>pre]:!my-0 my-5" id="code-group-${index}" data-group-number="${index}">`;
         }
-        markdownIt.renderer.rules[CodeGroupDecorator.KEY_CLOSE] = (tokens: Array<Token>, index: number, options: MarkdownIt.Options, env: any, self: Renderer): string => {
+            markdownIt.renderer.rules[CodeGroupDecorator.KEY_CLOSE] = (tokens: Array<Token>, index: number, options: MarkdownIt.Options, env: any, self: Renderer): string => {
             return `</div></div>`;
         }
     }

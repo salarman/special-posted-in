@@ -66,6 +66,7 @@ export function nestedToArray<T extends Nested>(nested: T): Array<T> {
     return result;
 }
 
+
 export interface Nested {
 
     children: Array<Nested>;
@@ -73,4 +74,12 @@ export interface Nested {
     addChild(child: Nested): void;
 
     serialize(): any;
+}
+
+export function arrayCopy<T extends string | number | boolean>(array: Array<T>): Array<T> {
+    return array.map(value => value);
+}
+
+export function arrayCopyWith<T>(array: Array<T>): Array<T> {
+    return array.map(value => structuredClone(value));
 }
