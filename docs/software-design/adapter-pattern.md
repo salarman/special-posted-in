@@ -71,21 +71,7 @@ public class PaypalAdapter implements Payment {
 
         return convertPayPalStatus(paymentStatus);
     }
-
-    private PaymentStatus convertPayPalStatus(PayPalPaymentStatus payPalPaymentStatus) {
-        switch (payPalPaymentStatus) {
-            case SUCCESS:
-                return PaymentStatus.COMPLETED;
-            case PENDING:
-                return PaymentStatus.PENDING;
-            case REFUND_SUCCESS:
-                return PaymentStatus.REFUNDED;
-            case CANCELLED:
-                return PaymentStatus.CANCELLED;
-            default:
-                return PaymentStatus.FAILED;
-        }
-    }
+    ...
 }
 ```
 ```PaymentProcessor.java
@@ -109,7 +95,142 @@ public class PaymentProcessor {
 
 ::
 
-Target: Payment.java
-Adapter: PaypalAdapter.java
-Adaptee: PayPalAPI.java
-Client: PaymentProcessor.java
+위의 코드로 어댑터 패턴의 핵심 구성요소를 설명하면 다음과 같다.
+
+* Target: Payment.java
+* Adapter: PaypalAdapter.java
+* Adaptee: PayPalAPI.java
+* Client: PaymentProcessor.java
+
+그리고 예시를 위해 추가적인 데이터가 아래와 같이 있다고 가정 한다.
+
+::code-group
+```PayPalPaymentRequest.java
+//페이팔 결제 요청정보
+public class PayPalPaymentRequest {
+
+    private final double amount;
+
+    public PayPalPaymentRequest(double amount) {
+        this.amount = amount;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+}
+```
+
+```PaypalTransactionId.java
+//페이팔 결제 ID
+public class PaypalTransactionId {
+
+    private final String txId;
+
+    public PaypalTransactionId(String txId) {
+        this.txId = txId;
+    }
+
+    public String getTxId() {
+        return txId;
+    }
+}
+```
+
+```Order.java
+//주문 정보
+public class Order {
+
+    private final double total;
+
+    public Order(double total) {
+        this.total = total;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+}
+```
+::
+
+위 정보를 조합하면 각 클래스간 역할 및 관계는 다음과 같다.
+
+```mermaid
+---
+title: 새로운 페이팔 결제수단에 대해 대응 가능한 어댑터 패턴
+config:
+    class:
+        hideEmptyMembersBox: true
+---
+classDiagram
+    class Payment {
+        +processPayment(double amount): void
+        +checkStatus(String paymentId): PaymentStatus
+    }
+    class LegacyPayment {
+        +processPayment(double amount): void
+        +checkStatus(String paymentId): PaymentStatus
+    }
+    class PayPalAPI {
+        +makePayment(PayPalPaymentRequest request): void
+        +getPaymentStatus(PaypalTransactionId txId): PayPalPaymentStatus
+    }
+    class PaypalAdapter {
+        -payPalAPI: PayPalAPI
+        +processPayment(double amount): void
+        +checkStatus(String paymentId): PaymentStatus
+    }
+    class PaymentProcessor {
+        +process(Order order): void
+    }
+    class PayPalPaymentRequest {
+        -amount: double
+        +getAmount(): double
+    }
+    class PaypalTransactionId {
+        -value: String
+        +getTxId(): String
+    }
+    class PayPalPaymentStatus {
+        SUCCESS
+        PENDING
+        FAILED
+        REFUND_SUCCESS
+        CANCELLED
+    }
+    class PaymentStatus {
+        PENDING
+        COMPLETED
+        FAILED
+        REFUNDED
+        CANCELLED
+    }
+    class Order {
+        +getTotal(): double
+    }
+    Payment <|-- PaypalAdapter
+    Payment <|-- LegacyPayment
+    PaypalAdapter --> PayPalAPI
+    PaymentProcessor --> Payment
+    PaymentProcessor --> Order
+    PayPalAPI --> PayPalPaymentRequest
+    PayPalAPI --> PaypalTransactionId
+```
+
+Adapter 패턴의 사용으로 새로운 결제수단이 추가되어도 기존의 결제처리 로직을 변경하지 않고 사용할 수 있다.
+* PayPalAdapter는 Payment 인터페이스를 구현하여 내부적으로 PayPalAPI를 사용하며, 기존 결제에 대한 행동에는 변화가 없다.
+* Payment 역할을 그대로 수행하며 내부적으로 실제 처리과정만 다를 뿐이다.
+
+```java
+Order order = new Order(100.0);
+
+PaymentProcessor processor = LocalDate.now().isBefore(LocalDate.of(2021, 4, 13))
+        ? new PaymentProcessor(new LegacyPayment())
+        : new PaymentProcessor(new PaypalAdapter(new PayPalAPI()));
+
+processor.process(order);
+```
+
+> 예를들어 `2021-04-13` 부터 PayPal 결제로만 서비스를 제공한다고 가정하면, 위와 같이 사용할 수 있다.
+:{ "type": "tip", "icon": "info" }

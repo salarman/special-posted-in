@@ -76,7 +76,7 @@ export default class CodeBlockDecorator implements IMarkdownDecorator {
 
     private decorateMermaid(token: Token, args: RendererRuleArguments): string {
         //클라이언트에서 처리를 위해 렌더링만 해준다.
-        return `<pre class="mermaid">${token.content}</pre>`;
+        return `<pre class="mermaid overflow-auto max-w-full max-h-96">${token.content}</pre>`;
     }
 
     private decorateHighlightLines(token: Token, lang: string, rawCode: string): string {

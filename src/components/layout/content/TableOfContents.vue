@@ -65,6 +65,14 @@ nuxtApp.hooks.hookOnce('page:finish', () => {
       ...document.querySelectorAll('h3')
     ]);
     //mermaid
+    mermaid.initialize({
+      startOnLoad: false,
+      themeVariables: {
+        // 노드 간격 조절
+        classDiagramNodeSpacing: 100,  // 기본값 50
+        classDiagramRankSpacing: 100,  // 기본값 50
+      }
+    });
     document.querySelectorAll('pre.mermaid')
         .forEach(async (element: Element) => {
           const {svg} = await mermaid.render(`mermaid-${element.id}`, unescapeHtml(element.innerHTML));
